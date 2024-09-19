@@ -4,6 +4,7 @@ from django.db.models import Count, Q, Value, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
+from django.urls import reverse_lazy
 from django.views import generic
 
 from task_manager.models import Worker, Task
@@ -89,3 +90,15 @@ class TeamListView(LoginRequiredMixin, generic.ListView):
         context["total_members"] = Worker.objects.count()
         context["title"] = "Our Team"
         return context
+
+
+class WorkerCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Worker
+    fields = ["first_name", "last_name", "position", "password"]
+    success_url = reverse_lazy("task_manager:team")
+
+
+class WorkerUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Worker
+    fields = ["first_name", "last_name", "username", "position"]
+    success_url = reverse_lazy("task_manager:team")
