@@ -102,3 +102,16 @@ class WorkerUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Worker
     fields = ["first_name", "last_name", "username", "position"]
     success_url = reverse_lazy("task_manager:team")
+
+
+class TaskUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Task
+    fields = "__all__"
+    success_url = reverse_lazy("task_manager:all-tasks")
+
+
+class TaskDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = Task
+    fields = "__all__"
+    success_url = reverse_lazy("task_manager:all-tasks")
+
