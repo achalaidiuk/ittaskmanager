@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+  <div class="container">
+    <h2 class="my-4">All Tasks</h2>
+    <div class="list-group">
+      {% for task in task_list %}
+        <div class="list-group-item">
+          <h5 class="mb-1">{{ task.task_name }}</h5>
+          <p class="mb-1"><strong>Description:</strong> {{ task.description }}</p>
+          <p class="mb-1"><strong>Deadline:</strong> {{ task.deadline }}</p>
+          <p class="mb-1"><strong>Responsible:</strong> {{ task.responsible }}</p>
+        </div>
+      {% empty %}
+        <p>No tasks available.</p>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

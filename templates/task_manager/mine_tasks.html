@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+  <div class="container">
+    <h2 class="my-4">Mine Tasks</h2>
+    
+    <div class="alert alert-info" role="alert">
+      <strong>Completed Tasks:</strong> {{ completed_tasks_count }}<br>
+      <strong>Incomplete Tasks:</strong> {{ incomplete_tasks_count }}
+    </div>
+    
+    {% if task_list %}
+      <div class="list-group">
+        {% for task in task_list %}
+          <a href="#" class="list-group-item list-group-item-action">
+            <h5 class="mb-1">{{ task.task_name }}</h5>
+            <p class="mb-1">{{ task.description }}</p>
+            <small class="text-muted">{{ task.get_priority_display }}</small>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No tasks available.</p>
+    {% endif %}
+  </div>
+{% endblock %}
