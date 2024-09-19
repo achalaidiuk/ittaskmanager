@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+  <div class="login-page">
+    <h1>Login</h1>
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        <p>Invalid credentials. Please try again.</p>
+      </div>
+    {% endif %}
+    {% if not user.is_authenticated %}
+      <div class="login-form">
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <div class="form-group">
+            <button type="submit" class="btn btn-success">Log in</button>
+          </div>
+          <input type="hidden" name="next" value="{{ next }}" />
+        </form>
+      </div>
+    {% else %}
+      <div class="alert alert-success">
+        <h3>You are already logged in!</h3>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
