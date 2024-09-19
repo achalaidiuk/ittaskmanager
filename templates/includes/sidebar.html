@@ -1,7 +1,36 @@
-{% extends "base.html" %}
-{% block sidebar %}
-  <a href="{% url "taxi:index" %}">Home page</a>
-  <a href="#">Manufacturers</a>
-  <a href="#">Cars</a>
-  <a href="#">Drivers</a>
-{% endblock %}
+<nav class="sidebar-nav navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="{% url 'core:index' %}">Task Manager</a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'core:index' %}">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'core:my-tasks' %}">My Tasks</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'core:all-tasks' %}">All Tasks</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'core:our-teams' %}">Our Team</a>
+      </li>
+      {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ user.get_absolute_url }}">{{ user.get_username }}</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+        </li>
+      {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'login' %}">Login</a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
