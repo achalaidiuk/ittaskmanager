@@ -10,7 +10,7 @@
     {% endif %}
     {% if not user.is_authenticated %}
       <div class="login-form">
-        <form method="post" action="{% url 'login' %}">
+        <form method="post" action="{% url 'task_manager:login' %}">
           {% csrf_token %}
           {{ form|crispy }}
           <div class="form-group">

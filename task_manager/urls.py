@@ -1,11 +1,16 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 
 
 from task_manager.views import (
     MineTasksListView,
     AllTasksListView,
     TeamListView,
-    index, TaskDeleteView, TaskUpdateView, WorkerCreateView, WorkerUpdateView
+    index,
+    TaskDeleteView,
+    TaskUpdateView,
+    WorkerCreateView,
+    WorkerUpdateView
 )
 
 
@@ -28,4 +33,5 @@ urlpatterns = [
     path("worker_update/<int:pk>/update",
          WorkerUpdateView.as_view(),
          name="worker-update"),
+    path("accounts/login/", auth_views.LoginView.as_view(), name="login"),
 ]
