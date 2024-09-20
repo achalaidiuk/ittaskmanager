@@ -13,8 +13,8 @@
           <p class="mb-1"><strong>Responsible:</strong> {{ task.responsible }}</p>
 
           <div class="mt-2">
-            <a href="{% url 'task_manager:task-update' task.id %}" class="btn btn-secondary btn-sm">Update</a>
             {% if request.user.is_superuser %}
+              <a href="{% url 'task_manager:task-update' task.id %}" class="btn btn-secondary btn-sm">Update</a>
               <a href="{% url 'task_manager:task-delete' task.id %}" class="btn btn-danger btn-sm"
                  onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
             {% endif %}

@@ -29,6 +29,11 @@ def index(request: HttpRequest) -> HttpResponse:
     )
 
 
+from django.db.models import Count, Q
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views import generic
+from .models import Task
+
 class MineTasksListView(LoginRequiredMixin, generic.ListView):
     model = Task
     context_object_name = "task_list"
@@ -38,23 +43,18 @@ class MineTasksListView(LoginRequiredMixin, generic.ListView):
         context = super().get_context_data(**kwargs)
 
         count_tasks = self.get_queryset().aggregate(
-            completed_tasks_count=Count(
-                "id", filter=Q(is_completed=True)
-            ),
-            unfinished_tasks_count=Count(
-                "id", filter=Q(is_completed=False)
-            )
+            completed_tasks_count=Count("id", filter=Q(is_completed=True)),
+            unfinished_tasks_count=Count("id", filter=Q(is_completed=False))
         )
 
         context["completed_tasks_count"] = count_tasks["completed_tasks_count"]
-        context["unfinished_tasks_count"] = count_tasks[
-            "unfinished_tasks_count"
-        ]
+        context["incomplete_tasks_count"] = count_tasks["unfinished_tasks_count"]  # Виправлено ключ
 
         return context
 
     def get_queryset(self):
         return Task.objects.filter(assignees=self.request.user)
+
 
 
 class AllTasksListView(LoginRequiredMixin, generic.ListView):
