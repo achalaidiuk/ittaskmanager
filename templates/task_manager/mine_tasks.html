@@ -12,8 +12,8 @@
     {% if task_list %}
       <div class="list-group">
         {% for task in task_list %}
-          <a href="#" class="list-group-item list-group-item-action">
-            <h5 class="mb-1">{{ task.task_name }}</h5>
+          <a href="{% url 'task_manager:task-detail' task.id %}" class="list-group-item list-group-item-action">
+            <h5 class="mb-1">{{ task.name }}</h5>
             <p class="mb-1">{{ task.description }}</p>
             <small class="text-muted">{{ task.get_priority_display }}</small>
           </a>

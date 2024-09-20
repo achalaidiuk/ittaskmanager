@@ -116,6 +116,17 @@ class TaskDeleteView(LoginRequiredMixin, generic.DeleteView):
     def test_func(self):
         return self.request.user.is_admin
 
+
+class TaskDetailView(generic.DetailView):
+    model = Task
+    template_name = "task_manager/task_detail.html"
+    context_object_name = 'task'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
 @login_required
 def work_done(request: HttpRequest, task_id: int) -> HttpResponse:
     task = get_object_or_404(Task, id=task_id)
