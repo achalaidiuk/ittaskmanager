@@ -1,10 +1,8 @@
 {% extends "base.html" %}
+
 {% block content %}
-  <div class="logout-message">
-    <h2>You have been logged out successfully.</h2>
-    <p>We hope to see you again soon!</p>
-    <a href="{% url 'login' %}" class="btn btn-primary">
-      Log in again
-    </a>
-  </div>
+<p>Logged out!</p>
+
+<a href="{% url 'logout' %}">Click here to login again.</a>
+
 {% endblock %}

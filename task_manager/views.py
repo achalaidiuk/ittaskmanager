@@ -1,10 +1,12 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q, Value, OuterRef, Subquery
 from django.db.models.functions import Coalesce
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views import generic
 
 from task_manager.models import Worker, Task
@@ -115,3 +117,29 @@ class TaskDeleteView(LoginRequiredMixin, generic.DeleteView):
     fields = "__all__"
     success_url = reverse_lazy("task_manager:all-tasks")
 
+    def test_func(self):
+        return self.request.user.is_admin
+
+@login_required
+def work_done(request: HttpRequest, task_id: int) -> HttpResponse:
+    task = get_object_or_404(Task, id=task_id)
+    task.is_completed = True
+    task.done_at = timezone.now()
+    task.save()
+    return HttpResponseRedirect(
+        request.META.get(
+            "HTTP_REFERER",
+            reverse_lazy(viewname="task_manager:mine-tasks"))
+    )
+
+
+@login_required
+def take_to_work(request: HttpRequest, task_id: int) -> HttpResponse:
+    task = get_object_or_404(Task, id=task_id)
+
+    if task.is_completed or task.assignees.filter(id=request.user.id).exists():
+        messages.warning(request, "This task has already been taken or completed.")
+        return redirect("task_manager:all-tasks")
+
+    task.assignees.add(request.user)
+    return redirect("task_manager:all-tasks")

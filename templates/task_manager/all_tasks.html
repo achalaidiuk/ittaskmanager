@@ -1,15 +1,27 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block content %}
   <div class="container">
     <h2 class="my-4">All Tasks</h2>
     <div class="list-group">
       {% for task in task_list %}
         <div class="list-group-item">
-          <h5 class="mb-1">{{ task.task_name }}</h5>
+          <h5 class="mb-1">{{ task.name }}</h5>
           <p class="mb-1"><strong>Description:</strong> {{ task.description }}</p>
           <p class="mb-1"><strong>Deadline:</strong> {{ task.deadline }}</p>
           <p class="mb-1"><strong>Responsible:</strong> {{ task.responsible }}</p>
+
+          <div class="mt-2">
+            <a href="{% url 'task_manager:task-update' task.id %}" class="btn btn-secondary btn-sm">Update</a>
+            {% if request.user.is_superuser %}
+              <a href="{% url 'task_manager:task-delete' task.id %}" class="btn btn-danger btn-sm"
+                 onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+            {% endif %}
+            {% if task.assignees.count == 0 %}
+              <a href="{% url 'task_manager:take-to-work' task.id %}" class="btn btn-success btn-sm">Take to Work</a>
+            {% endif %}
+          </div>
         </div>
       {% empty %}
         <p>No tasks available.</p>

@@ -10,7 +10,7 @@ from task_manager.views import (
     TaskDeleteView,
     TaskUpdateView,
     WorkerCreateView,
-    WorkerUpdateView
+    WorkerUpdateView, take_to_work
 )
 
 
@@ -34,4 +34,6 @@ urlpatterns = [
          WorkerUpdateView.as_view(),
          name="worker-update"),
     path("accounts/login/", auth_views.LoginView.as_view(), name="login"),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('task/<int:task_id>/take/', take_to_work, name='take-to-work'),
 ]
