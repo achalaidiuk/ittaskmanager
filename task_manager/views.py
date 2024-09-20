@@ -14,25 +14,21 @@ from task_manager.models import Worker, Task
 
 @login_required
 def index(request: HttpRequest) -> HttpResponse:
-
     num_workers = Worker.objects.count()
-    num_visits = request.session.get("num_visits", 0)
-    request.session["num_visits"] = num_visits + 1
+    num_tasks = Task.objects.count()
+    completed_tasks = Task.objects.filter(is_completed=True).count()
+    last_added_task = Task.objects.order_by('-created_at').first()
 
     context = {
         "num_workers": num_workers,
-        "num_visits": num_visits + 1,
+        "num_tasks": num_tasks,
+        "completed_tasks": completed_tasks,
+        "last_added_task": last_added_task.name if last_added_task else "None",
+        "num_visits": request.session.get("num_visits", 0) + 1,
     }
 
-    return render(
-        request, "task_manager/index.html", context=context
-    )
+    return render(request, "task_manager/index.html", context=context)
 
-
-from django.db.models import Count, Q
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views import generic
-from .models import Task
 
 class MineTasksListView(LoginRequiredMixin, generic.ListView):
     model = Task
