@@ -44,7 +44,7 @@ class MineTasksListView(LoginRequiredMixin, generic.ListView):
         )
 
         context["completed_tasks_count"] = count_tasks["completed_tasks_count"]
-        context["incomplete_tasks_count"] = count_tasks["unfinished_tasks_count"]  # Виправлено ключ
+        context["incomplete_tasks_count"] = count_tasks["unfinished_tasks_count"]
 
         return context
 
@@ -66,6 +66,40 @@ class AllTasksListView(LoginRequiredMixin, generic.ListView):
                 ),
                 Value("Not assigned")
             )
+        )
+
+    def manage_task(request: HttpRequest, task_id: int,
+                    action: str) -> HttpResponse:
+        task = get_object_or_404(Task, id=task_id)
+
+        if action == "complete":
+            if request.user in task.assignees.all():
+                task.is_completed = True
+                task.status = "Done"
+                task.done_at = timezone.now()
+                task.save()
+                messages.success(request, "Task has been marked as completed.")
+            else:
+                messages.warning(request,
+                                 "You cannot complete this task because you are not assigned to it.")
+            return redirect("task_manager:all-tasks")
+
+        # Взяти завдання в роботу
+        elif action == "take":
+            if task.is_completed or task.assignees.filter(
+                    id=request.user.id).exists():
+                messages.warning(request,
+                                 "This task has already been taken or completed.")
+            else:
+                task.assignees.add(request.user)
+                task.status = "In Progress"
+                task.save()
+                messages.success(request, "You have taken the task to work.")
+            return redirect("task_manager:all-tasks")
+
+        return HttpResponseRedirect(
+            request.META.get("HTTP_REFERER",
+                             reverse_lazy("task_manager:mine-tasks"))
         )
 
     def get_context_data(self, **kwargs):

@@ -19,7 +19,11 @@
       <li class="nav-item">
         <a class="nav-link" href="{% url 'task_manager:team' %}">Team</a>
       </li>
+
       {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+        </li>
       {% else %}
         <li class="nav-item">
           <a class="nav-link" href="{% url 'task_manager:login' %}">Login</a>
