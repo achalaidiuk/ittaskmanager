@@ -45,6 +45,7 @@ class Task(models.Model):
         ("Done", "Done"),
     ]
 
+    done_at = models.DateTimeField(null=True, blank=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
     deadline = models.DateTimeField()
