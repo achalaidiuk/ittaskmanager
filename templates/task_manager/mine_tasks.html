@@ -9,24 +9,24 @@
       <strong>Incomplete Tasks:</strong> {{ incomplete_tasks_count }}
     </div>
 
-    {% if task_list %}
-      <div class="list-group">
-        {% for task in task_list %}
-          <a href="{% url 'task_manager:task-detail' task.id %}" class="list-group-item list-group-item-action">
-            <h5 class="mb-1">{{ task.name }}</h5>
-            <p class="mb-1">{{ task.description }}</p>
-            <small class="text-muted">{{ task.get_priority_display }}</small><br>
-            
-            {% if task.is_completed %}
-              <small class="text-success">Completed at: {{ task.done_at|date:"Y-m-d H:i" }}</small>
-            {% else %}
-              <small class="text-danger">Not yet completed</small>
-            {% endif %}
-          </a>
-        {% endfor %}
-      </div>
-    {% else %}
-      <p>No tasks available.</p>
-    {% endif %}
+{% if task_list %}
+  <div class="list-group">
+    {% for task in task_list %}
+      <a href="{% url 'task_manager:task-detail' task.id %}" class="list-group-item list-group-item-action">
+        <h5 class="mb-1">{{ task.name }}</h5>
+        <p class="mb-1">{{ task.description }}</p>
+        <small class="text-muted">{{ task.get_priority_display }}</small><br>
+
+        {% if task.is_completed %}
+          <small class="text-success">Completed at: {{ task.done_at|date:"Y-m-d H:i" }}</small>
+        {% else %}
+          <small class="text-danger">Not yet completed</small>
+        {% endif %}
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>No tasks available.</p>
+{% endif %}
   </div>
 {% endblock %}

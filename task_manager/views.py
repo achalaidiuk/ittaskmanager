@@ -46,10 +46,11 @@ class MineTasksListView(LoginRequiredMixin, generic.ListView):
         context["completed_tasks_count"] = count_tasks["completed_tasks_count"]
         context["incomplete_tasks_count"] = count_tasks["unfinished_tasks_count"]
 
-        return context
+        for task in self.get_queryset():
+            if task.is_completed:
+                context['done_at'] = task.done_at
 
-    def get_queryset(self):
-        return Task.objects.filter(assignees=self.request.user)
+        return context
 
 
 
@@ -84,7 +85,6 @@ class AllTasksListView(LoginRequiredMixin, generic.ListView):
                                  "You cannot complete this task because you are not assigned to it.")
             return redirect("task_manager:all-tasks")
 
-        # Взяти завдання в роботу
         elif action == "take":
             if task.is_completed or task.assignees.filter(
                     id=request.user.id).exists():
@@ -194,6 +194,7 @@ def complete_task(request: HttpRequest, task_id: int) -> HttpResponse:
     if request.user in task.assignees.all():
         task.is_completed = True
         task.status = "Done"
+        task.done_at = timezone.now()
         task.save()
         messages.success(request, "Task has been marked as completed.")
     else:

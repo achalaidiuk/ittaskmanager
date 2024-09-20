@@ -14,6 +14,7 @@
           <p class="mb-1"><strong>Status:</strong>
             {% if task.is_completed %}
               <span class="badge badge-success">Done</span>
+              <p class="mb-1"><strong>Completed At:</strong> {{ task.done_at|date:"Y-m-d H:i" }}</p>
             {% elif task.assignees.count > 0 %}
               <span class="badge badge-warning">In Progress</span>
             {% else %}
