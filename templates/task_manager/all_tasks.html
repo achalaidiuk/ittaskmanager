@@ -11,6 +11,17 @@
           <p class="mb-1"><strong>Description:</strong> {{ task.description }}</p>
           <p class="mb-1"><strong>Deadline:</strong> {{ task.deadline }}</p>
           <p class="mb-1"><strong>Responsible:</strong> {{ task.responsible }}</p>
+          <p class="mb-1"><strong>Status:</strong>
+            {% if task.status == 'In Progress' %}
+              <span class="badge badge-warning">In Progress</span>
+            {% elif task.status == 'Done' %}
+              <span class="badge badge-success">Done</span>
+            {% elif task.status == 'New' %}
+              <span class="badge badge-primary">New</span>
+            {% else %}
+              <span class="badge badge-secondary">{{ task.status }}</span>
+            {% endif %}
+          </p>
 
           <div class="mt-2">
             {% if request.user.is_superuser %}

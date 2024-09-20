@@ -39,6 +39,12 @@ class Task(models.Model):
         ("High", "High"),
     ]
 
+    STATUS_CHOICES = [
+        ("New", "New"),
+        ("In Progress", "In Progress"),
+        ("Done", "Done"),
+    ]
+
     name = models.CharField(max_length=100)
     description = models.TextField()
     deadline = models.DateTimeField()
@@ -50,6 +56,7 @@ class Task(models.Model):
     assignees = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="tasks", blank=True
     )
+    status = models.CharField(choices=STATUS_CHOICES, max_length=12, default="New")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
