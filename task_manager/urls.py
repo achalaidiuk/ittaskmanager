@@ -41,4 +41,5 @@ urlpatterns = [
          views.complete_task,
          name="complete-task"
          ),
+    path("accounts/login/", auth_views.LoginView.as_view(), name="login"),
 ]
