@@ -149,4 +149,20 @@ def take_to_work(request: HttpRequest, task_id: int) -> HttpResponse:
         return redirect("task_manager:all-tasks")
 
     task.assignees.add(request.user)
+    task.status = "In Progress"
+    task.save()
+    messages.success(request, "You have taken the task to work.")
+    return redirect("task_manager:all-tasks")
+
+def complete_task(request: HttpRequest, task_id: int) -> HttpResponse:
+    task = get_object_or_404(Task, id=task_id)
+
+    if request.user in task.assignees.all():
+        task.is_completed = True
+        task.status = "Done"
+        task.save()
+        messages.success(request, "Task has been marked as completed.")
+    else:
+        messages.warning(request, "You cannot complete this task because you are not assigned to it.")
+
     return redirect("task_manager:all-tasks")
