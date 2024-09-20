@@ -53,7 +53,6 @@ class MineTasksListView(LoginRequiredMixin, generic.ListView):
         return context
 
 
-
 class AllTasksListView(LoginRequiredMixin, generic.ListView):
     model = Task
     template_name = "all_tasks.html"
@@ -201,3 +200,18 @@ def complete_task(request: HttpRequest, task_id: int) -> HttpResponse:
         messages.warning(request, "You cannot complete this task because you are not assigned to it.")
 
     return redirect("task_manager:all-tasks")
+
+
+@login_required
+def assign_task(request, member_id):
+    member = Worker.objects.get(id=member_id)
+    tasks = Task.objects.filter(is_completed=False)
+
+    if request.method == "POST":
+        task_id = request.POST.get('task_id')
+        task = Task.objects.get(id=task_id)
+        task.assignees.add(member)
+        task.save()
+        return redirect('task_manager:team')
+
+    return render(request, 'assign_task.html', {'member': member, 'tasks': tasks})

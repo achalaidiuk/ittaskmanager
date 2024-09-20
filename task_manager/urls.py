@@ -12,7 +12,7 @@ from task_manager.views import (
     WorkerCreateView,
     WorkerUpdateView,
     take_to_work,
-    TaskDetailView
+    TaskDetailView, assign_task
 )
 
 
@@ -42,4 +42,5 @@ urlpatterns = [
          name="complete-task"
          ),
     path("accounts/login/", auth_views.LoginView.as_view(), name="login"),
+    path('assign-task/<int:member_id>/', assign_task, name='assign_task'),
 ]

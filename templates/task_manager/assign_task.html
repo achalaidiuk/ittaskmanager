@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+  <div class="container mt-4">
+    <h1>Assign Task to {{ member.username }}</h1>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="task">Select a Task:</label>
+        <select class="form-control" id="task" name="task_id">
+          {% for task in tasks %}
+            <option value="{{ task.id }}">{{ task.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Assign</button>
+      <a href="{% url 'task_manager:team' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+{% endblock %}
