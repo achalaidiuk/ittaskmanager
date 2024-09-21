@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<p>Logged out!</p>
-
-<a href="{% url 'login'%}">Click here to login again.</a>
+  <p>
+    <i class="fas fa-sign-out-alt"></i> Logged out!
+  </p>
+  <a href="{% url 'login' %}" class="btn btn-primary">
+    <i class="fas fa-sign-in-alt"></i> Click here to login again.
+  </a>
 {% endblock %}
