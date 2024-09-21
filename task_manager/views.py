@@ -7,8 +7,9 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views import generic
+from django.views import generic, View
 
+from task_manager.forms import TaskCreationForm
 from task_manager.models import Worker, Task
 
 
@@ -64,14 +65,14 @@ class AllTasksListView(LoginRequiredMixin, generic.ListView):
         return Task.objects.annotate(
             responsible=Coalesce(
                 Subquery(
-                    Task.assignees.through.objects.filter(task_id=OuterRef("pk")).values("worker__username")[:1]
+                    Task.assignees.through.objects.filter(task_id=OuterRef("pk"))
+                    .values("worker__username")[:1]
                 ),
                 Value("Not assigned")
             )
         )
 
-    def manage_task(request: HttpRequest, task_id: int,
-                    action: str) -> HttpResponse:
+    def manage_task(self, request, task_id, action):
         task = get_object_or_404(Task, id=task_id)
 
         if action == "complete":
@@ -82,15 +83,12 @@ class AllTasksListView(LoginRequiredMixin, generic.ListView):
                 task.save()
                 messages.success(request, "Task has been marked as completed.")
             else:
-                messages.warning(request,
-                                 "You cannot complete this task because you are not assigned to it.")
+                messages.warning(request, "You cannot complete this task because you are not assigned to it.")
             return redirect("task_manager:all-tasks")
 
         elif action == "take":
-            if task.is_completed or task.assignees.filter(
-                    id=request.user.id).exists():
-                messages.warning(request,
-                                 "This task has already been taken or completed.")
+            if task.is_completed or task.assignees.filter(id=request.user.id).exists():
+                messages.warning(request, "This task has already been taken or completed.")
             else:
                 task.assignees.add(request.user)
                 task.status = "In Progress"
@@ -98,10 +96,7 @@ class AllTasksListView(LoginRequiredMixin, generic.ListView):
                 messages.success(request, "You have taken the task to work.")
             return redirect("task_manager:all-tasks")
 
-        return HttpResponseRedirect(
-            request.META.get("HTTP_REFERER",
-                             reverse_lazy("task_manager:mine-tasks"))
-        )
+        return redirect("task_manager:all-tasks")  # Adjusted for clarity
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -135,6 +130,21 @@ class WorkerUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Worker
     fields = ["first_name", "last_name", "username", "position"]
     success_url = reverse_lazy("task_manager:team")
+
+
+class TaskCreateView(LoginRequiredMixin, View):
+    def get(self, request):
+        form = TaskCreationForm()
+        return render(request, "task_manager/task_form.html", {"form": form, "object": None})
+
+    def post(self, request):
+        form = TaskCreationForm(request.POST)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.save()
+            messages.success(request, "Task has been created successfully.")
+            return redirect("task_manager:all-tasks")
+        return render(request, "task_manager/task_form.html", {"form": form, "object": None})
 
 
 class TaskUpdateView(LoginRequiredMixin, generic.UpdateView):

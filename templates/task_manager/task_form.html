@@ -8,4 +8,18 @@
 
     <input type="submit" value="Submit" class="btn btn-primary">
   </form>
+
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+      {{ form.non_field_errors }}
+    </div>
+  {% endif %}
+
+  {% for field in form %}
+    {% if field.errors %}
+      <div class="alert alert-danger">
+        {{ field.errors }}
+      </div>
+    {% endif %}
+  {% endfor %}
 {% endblock %}

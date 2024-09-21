@@ -4,6 +4,9 @@
 {% block content %}
   <div class="container">
     <h2 class="my-4">All Tasks</h2>
+    <div class="mb-3">
+      <a href="{% url 'task_manager:task-create' %}" class="btn btn-primary">Create New Task</a>
+    </div>
     <div class="list-group">
       {% for task in task_list %}
         <div class="list-group-item">
