@@ -33,10 +33,10 @@ def index(request: HttpRequest) -> HttpResponse:
 
     return render(request, "task_manager/index.html", context=context)
 
-class MineTasksListView(LoginRequiredMixin, generic.ListView):
+class MyTasksListView(LoginRequiredMixin, generic.ListView):
     model = Task
     context_object_name = "task_list"
-    template_name = "mine_tasks.html"
+    template_name = "my_tasks.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -181,7 +181,7 @@ def work_done(request: HttpRequest, task_id: int) -> HttpResponse:
     return HttpResponseRedirect(
         request.META.get(
             "HTTP_REFERER",
-            reverse_lazy(viewname="task_manager:mine-tasks"))
+            reverse_lazy(viewname="task_manager:my-tasks"))
     )
 
 

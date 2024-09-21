@@ -18,7 +18,7 @@
         <a href="{% url 'task_manager:task-delete' task.id %}" class="btn btn-danger"
            onclick="return confirm('Are you sure?');">Delete</a>
       {% endif %}
-      <a href="{% url 'task_manager:mine-tasks' %}" class="btn btn-primary">Back to Mine Tasks</a>
+      <a href="{% url 'task_manager:my-tasks' %}" class="btn btn-primary">Back to Mine Tasks</a>
     </div>
   </div>
 {% endblock %}

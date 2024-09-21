@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 
 from task_manager import views
 from task_manager.views import (
-    MineTasksListView,
+    MyTasksListView,
     AllTasksListView,
     TeamListView,
     index,
@@ -22,7 +22,7 @@ app_name = "task_manager"
 
 urlpatterns = [
     path("", index, name="index"),
-    path("mine/", MineTasksListView.as_view(), name="mine-tasks"),
+    path("my/", MyTasksListView.as_view(), name="my-tasks"),
     path("all/", AllTasksListView.as_view(), name="all-tasks"),
     path("team/", TeamListView.as_view(), name="team"),
     path("task/create/", TaskCreateView.as_view(), name="task-create"),
