@@ -60,3 +60,26 @@
 .sidebar-footer {
   margin-top: auto;
 }
+
+.login-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-page {
+  background-color: #f7f7f7;
+  height: 100vh;
+}
+
+.login-card h1 {
+  margin-bottom: 20px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.alert {
+  margin-bottom: 20px;
+}
