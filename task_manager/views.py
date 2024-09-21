@@ -19,16 +19,18 @@ def index(request: HttpRequest) -> HttpResponse:
     completed_tasks = Task.objects.filter(is_completed=True).count()
     last_added_task = Task.objects.order_by('-created_at').first()
 
+    num_visits = request.session.get("num_visits", 0) + 1
+    request.session["num_visits"] = num_visits
+
     context = {
         "num_workers": num_workers,
         "num_tasks": num_tasks,
         "completed_tasks": completed_tasks,
-        "last_added_task": last_added_task.name if last_added_task else "None",
-        "num_visits": request.session.get("num_visits", 0) + 1,
+        "last_added_task": last_added_task,
+        "num_visits": num_visits,
     }
 
     return render(request, "task_manager/index.html", context=context)
-
 
 class MineTasksListView(LoginRequiredMixin, generic.ListView):
     model = Task
