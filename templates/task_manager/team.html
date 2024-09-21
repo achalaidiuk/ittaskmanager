@@ -2,13 +2,21 @@
 {% load static %}
 {% block content %}
   <div class="container mt-4">
-    <h1 class="mb-4">Our Team Members</h1>
+    <h1 class="mb-4 text-center">Our Team Members</h1>
     
+    {% if request.user.is_superuser %}
+      <div class="mb-4">
+        <div class="text-start">
+          <a href="{% url 'task_manager:worker-create' %}" class="btn btn-success">Create New Worker</a>
+        </div>
+      </div>
+    {% endif %}
+
     {% if team_members %}
       <div class="row">
         {% for member in team_members %}
-          <div class="col-md-4 mb-3">
-            <div class="card">
+          <div class="col-md-6 mb-4">  <!-- Зміни тут для двох рядків -->
+            <div class="card shadow-sm">
               <div class="card-body">
                 <h5 class="card-title">{{ member.username }}</h5>
                 <h6 class="card-subtitle mb-2 text-muted">{{ member.position.name|default:"Not assigned" }}</h6>
@@ -17,7 +25,9 @@
                   <strong>Last Name:</strong> {{ member.last_name }}
                 </p>
                 {% if request.user.is_superuser %}
-                  <a href="{% url 'task_manager:assign_task' member.id %}" class="btn btn-primary">Assign Task</a>
+                  <div class="text-center">
+                    <a href="{% url 'task_manager:assign_task' member.id %}" class="btn btn-primary">Assign Task</a>
+                  </div>
                 {% endif %}
               </div>
             </div>
@@ -25,7 +35,7 @@
         {% endfor %}
       </div>
     {% else %}
-      <div class="alert alert-info" role="alert">
+      <div class="alert alert-info text-center" role="alert">
         No team members available.
       </div>
     {% endif %}
