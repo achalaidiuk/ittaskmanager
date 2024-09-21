@@ -96,7 +96,7 @@ class AllTasksListView(LoginRequiredMixin, generic.ListView):
                 messages.success(request, "You have taken the task to work.")
             return redirect("task_manager:all-tasks")
 
-        return redirect("task_manager:all-tasks")  # Adjusted for clarity
+        return redirect("task_manager:all-tasks")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
