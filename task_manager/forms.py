@@ -4,9 +4,6 @@ from .models import Task, Worker
 
 
 class TaskCreationForm(forms.ModelForm):
-    responsible = forms.ModelChoiceField(
-        queryset=Worker.objects.all(), required=True
-    )
 
     class Meta:
         model = Task
@@ -16,7 +13,7 @@ class TaskCreationForm(forms.ModelForm):
             "task_type",
             "description",
             "deadline",
-            "responsible",
+            "assignees",
         ]
 
         widgets = {
