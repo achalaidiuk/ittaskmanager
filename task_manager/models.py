@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
 from django.conf import settings
 
 
@@ -21,7 +20,7 @@ class Worker(AbstractUser):
 
     class Meta:
         verbose_name_plural = "Workers"
-        ordering = ["last_name", "first_name", "position", ]
+        ordering = ["last_name", "first_name", "position"]
 
 
 class TaskType(models.Model):
@@ -32,7 +31,6 @@ class TaskType(models.Model):
 
 
 class Task(models.Model):
-
     PRIORITY_CHOICES = [
         ("Low", "Low"),
         ("Medium", "Medium"),
@@ -60,6 +58,13 @@ class Task(models.Model):
     status = models.CharField(choices=STATUS_CHOICES, max_length=12, default="New")
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        if self.is_completed:
+            self.status = "Done"
+        else:
+            self.status = "In Progress"
+        super().save(*args, **kwargs)
+
     def __str__(self):
         assignee_names = ", ".join(str(assignee) for assignee in self.assignees.all())
-        return f"{self.name} assigned to {assignee_names} with {self.priority} priority"
+        return f"{self.name} assigned to {assignee_names} with {self.priority} priority, Status: {self.status}"

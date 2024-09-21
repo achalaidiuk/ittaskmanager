@@ -38,6 +38,9 @@ class MyTasksListView(LoginRequiredMixin, generic.ListView):
     context_object_name = "task_list"
     template_name = "my_tasks.html"
 
+    def get_queryset(self):
+        return Task.objects.filter(assignees=self.request.user)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -49,11 +52,8 @@ class MyTasksListView(LoginRequiredMixin, generic.ListView):
         context["completed_tasks_count"] = count_tasks["completed_tasks_count"]
         context["incomplete_tasks_count"] = count_tasks["unfinished_tasks_count"]
 
-        for task in self.get_queryset():
-            if task.is_completed:
-                context['done_at'] = task.done_at
-
         return context
+
 
 
 class AllTasksListView(LoginRequiredMixin, generic.ListView):
