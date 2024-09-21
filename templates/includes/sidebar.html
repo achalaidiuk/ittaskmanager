@@ -1,34 +1,43 @@
-<nav class="sidebar-nav navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="{% url 'task_manager:index' %}">Task Manager</a>
+{% load static %}
 
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarNavDropdown">
-    <ul class="navbar-nav flex-column">
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'task_manager:index' %}">Home</a>
+<aside class="sidebar bg-dark text-light" id="sidebar">
+  <div class="sidebar-header">
+    <h3 id="sidebar-title">Task Manager</h3>
+    <button class="sidebar-toggle" type="button" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+      <span>&#9776;</span>
+    </button>
+  </div>
+  <div class="sidebar-content">
+    <ul class="sidebar-menu">
+      <li class="sidebar-item">
+        <a class="sidebar-link" href="{% url 'task_manager:index' %}">Home</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'task_manager:my-tasks' %}">My Tasks</a>
+      <li class="sidebar-item">
+        <a class="sidebar-link" href="{% url 'task_manager:my-tasks' %}">My Tasks</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'task_manager:all-tasks' %}">All Tasks</a>
+      <li class="sidebar-item">
+        <a class="sidebar-link" href="{% url 'task_manager:all-tasks' %}">All Tasks</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'task_manager:team' %}">Team</a>
+      <li class="sidebar-item">
+        <a class="sidebar-link" href="{% url 'task_manager:team' %}">Team</a>
       </li>
-
-      {% if user.is_authenticated %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-        </li>
-      {% else %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'task_manager:login' %}">Login</a>
-        </li>
-      {% endif %}
     </ul>
   </div>
-</nav>
+  <div class="sidebar-footer">
+    {% if user.is_authenticated %}
+      <a class="sidebar-link" href="{% url 'logout' %}">Logout</a>
+    {% else %}
+      <a class="sidebar-link" href="{% url 'task_manager:login' %}">Login</a>
+    {% endif %}
+  </div>
+</aside>
+
+<script>
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.classList.toggle("collapsed");
+
+  const title = document.getElementById("sidebar-title");
+  title.style.display = sidebar.classList.contains("collapsed") ? "none" : "block";
+}
+</script>
