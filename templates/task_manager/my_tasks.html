@@ -12,7 +12,7 @@
     <div class="row">
       <div class="col-md-6">
         <h4 class="text-center text-success">Completed Tasks</h4>
-        {% if task_list %}
+        {% if completed_tasks %}
           <table class="table table-striped">
             <thead>
               <tr>
@@ -22,16 +22,14 @@
               </tr>
             </thead>
             <tbody>
-              {% for task in task_list %}
-                {% if task.is_completed %}
-                  <tr>
-                    <td>
-                      <a href="{% url 'task_manager:task-detail' task.id %}" class="text-success font-weight-bold">{{ task.name }}</a>
-                    </td>
-                    <td>{{ task.get_priority_display }}</td>
-                    <td>{{ task.done_at|date:"Y-m-d H:i" }}</td>
-                  </tr>
-                {% endif %}
+              {% for task in completed_tasks %}
+                <tr>
+                  <td>
+                    <a href="{% url 'task_manager:task-detail' task.id %}" class="text-success font-weight-bold">{{ task.name }}</a>
+                  </td>
+                  <td>{{ task.get_priority_display }}</td>
+                  <td>{{ task.done_at|date:"Y-m-d H:i" }}</td>
+                </tr>
               {% endfor %}
             </tbody>
           </table>
@@ -42,7 +40,7 @@
 
       <div class="col-md-6">
         <h4 class="text-center text-danger">Incomplete Tasks</h4>
-        {% if task_list %}
+        {% if incomplete_tasks %}
           <table class="table table-striped">
             <thead>
               <tr>
@@ -52,16 +50,14 @@
               </tr>
             </thead>
             <tbody>
-              {% for task in task_list %}
-                {% if not task.is_completed %}
-                  <tr>
-                    <td>
-                      <a href="{% url 'task_manager:task-detail' task.id %}" class="text-danger font-weight-bold">{{ task.name }}</a>
-                    </td>
-                    <td>{{ task.get_priority_display }}</td>
-                    <td class="text-danger">Not yet completed</td>
-                  </tr>
-                {% endif %}
+              {% for task in incomplete_tasks %}
+                <tr>
+                  <td>
+                    <a href="{% url 'task_manager:task-detail' task.id %}" class="text-danger font-weight-bold">{{ task.name }}</a>
+                  </td>
+                  <td>{{ task.get_priority_display }}</td>
+                  <td class="text-danger">Not yet completed</td>
+                </tr>
               {% endfor %}
             </tbody>
           </table>

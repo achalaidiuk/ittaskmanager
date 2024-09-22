@@ -27,7 +27,7 @@
             <td>{{ task.description }}</td>
             <td>{{ task.deadline|date:"Y-m-d" }}</td>
             <td>
-              {% if task.assignees.count > 0 %}
+              {% if task.assignees.all %}
                 {% for worker in task.assignees.all %}
                   <span class="badge badge-info">{{ worker.username }}</span>
                 {% endfor %}
@@ -39,7 +39,7 @@
               {% if task.is_completed %}
                 <span class="badge badge-success">Done</span>
                 <p class="mb-1"><strong>Completed At:</strong> {{ task.done_at|date:"Y-m-d H:i" }}</p>
-              {% elif task.assignees.count > 0 %}
+              {% elif task.assignees.all %}
                 <span class="badge badge-warning">In Progress</span>
               {% else %}
                 <span class="badge badge-primary">New</span>

@@ -40,18 +40,22 @@ class MyTasksListView(LoginRequiredMixin, generic.ListView):
     template_name = "my_tasks.html"
 
     def get_queryset(self):
-        return Task.objects.filter(assignees=self.request.user)
+        return Task.objects.filter(assignees=self.request.user).prefetch_related('assignees')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        count_tasks = self.get_queryset().aggregate(
+        task_queryset = self.get_queryset()
+
+        count_tasks = task_queryset.aggregate(
             completed_tasks_count=Count("id", filter=Q(is_completed=True)),
             unfinished_tasks_count=Count("id", filter=Q(is_completed=False))
         )
 
         context["completed_tasks_count"] = count_tasks["completed_tasks_count"]
         context["incomplete_tasks_count"] = count_tasks["unfinished_tasks_count"]
+        context["completed_tasks"] = task_queryset.filter(is_completed=True)
+        context["incomplete_tasks"] = task_queryset.filter(is_completed=False)
 
         return context
 
@@ -62,7 +66,7 @@ class AllTasksListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 8
 
     def get_queryset(self) -> QuerySet:
-        return Task.objects.annotate(
+        return Task.objects.prefetch_related("assignees").annotate(
             responsible=Coalesce(
                 Value("Not assigned"),
                 "assignees__username"
@@ -71,7 +75,7 @@ class AllTasksListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["all_possible_tasks"] = Task.objects.count()
+        context["all_possible_tasks"] = self.model.objects.count()
         return context
 
 
@@ -108,13 +112,14 @@ class TeamListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 8
 
     def get_queryset(self):
-        return Worker.objects.order_by("first_name", "last_name")
+        return Worker.objects.select_related("position").prefetch_related("tasks").order_by("first_name", "last_name")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["total_members"] = Worker.objects.count()
+        context["total_members"] = self.get_queryset().count()
         context["title"] = "Our Team"
         return context
+
 
 
 class WorkerCreateView(LoginRequiredMixin, generic.CreateView):
@@ -152,11 +157,16 @@ class TaskUpdateView(LoginRequiredMixin, generic.UpdateView):
 
 class TaskDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Task
-    fields = "__all__"
+    template_name = 'task_manager/task_confirm_delete.html'
     success_url = reverse_lazy("task_manager:all-tasks")
 
     def test_func(self):
         return self.request.user.is_admin
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['task'] = self.object
+        return context
 
 
 class TaskDetailView(generic.DetailView):
