@@ -50,12 +50,14 @@ class Task(models.Model):
     is_completed = models.BooleanField(default=False)
     priority = models.CharField(choices=PRIORITY_CHOICES, max_length=6)
     task_type = models.ForeignKey(
-        'TaskType', on_delete=models.CASCADE, related_name="tasks"
+        "TaskType", on_delete=models.CASCADE, related_name="tasks"
     )
     assignees = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="tasks", blank=True
     )
-    status = models.CharField(choices=STATUS_CHOICES, max_length=12, default="New")
+    status = models.CharField(
+        choices=STATUS_CHOICES, max_length=12, default="New"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -66,5 +68,9 @@ class Task(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        assignee_names = ", ".join(str(assignee) for assignee in self.assignees.all())
-        return f"{self.name} assigned to {assignee_names} with {self.priority} priority, Status: {self.status}"
+        assignee_names = ", ".join(
+            str(assignee) for assignee in self.assignees.all())
+        return (
+            f"{self.name} assigned to {assignee_names} "
+            f"with {self.priority} priority, Status: {self.status}"
+        )

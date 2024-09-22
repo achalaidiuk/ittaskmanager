@@ -25,6 +25,7 @@ class WorkerAdmin(UserAdmin):
         )
     )
 
+
 admin.site.register(TaskType)
 admin.site.register(Position)
 admin.site.register(Task)

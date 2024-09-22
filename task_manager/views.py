@@ -18,7 +18,7 @@ def index(request: HttpRequest) -> HttpResponse:
     num_workers = Worker.objects.count()
     num_tasks = Task.objects.count()
     completed_tasks = Task.objects.filter(is_completed=True).count()
-    last_added_task = Task.objects.order_by('-created_at').first()
+    last_added_task = Task.objects.order_by("-created_at").first()
 
     num_visits = request.session.get("num_visits", 0) + 1
     request.session["num_visits"] = num_visits
@@ -31,7 +31,9 @@ def index(request: HttpRequest) -> HttpResponse:
         "num_visits": num_visits,
     }
 
-    return render(request, "task_manager/index.html", context=context)
+    return render(
+        request, "task_manager/index.html", context=context
+    )
 
 
 class MyTasksListView(LoginRequiredMixin, generic.ListView):
@@ -40,7 +42,10 @@ class MyTasksListView(LoginRequiredMixin, generic.ListView):
     template_name = "my_tasks.html"
 
     def get_queryset(self):
-        return Task.objects.filter(assignees=self.request.user).prefetch_related('assignees')
+        return (
+            Task.objects.filter(assignees=self.request.user)
+                .prefetch_related("assignees")
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -48,12 +53,18 @@ class MyTasksListView(LoginRequiredMixin, generic.ListView):
         task_queryset = self.get_queryset()
 
         count_tasks = task_queryset.aggregate(
-            completed_tasks_count=Count("id", filter=Q(is_completed=True)),
-            unfinished_tasks_count=Count("id", filter=Q(is_completed=False))
+            completed_tasks_count=Count(
+                "id", filter=Q(is_completed=True)
+            ),
+            unfinished_tasks_count=Count(
+                "id", filter=Q(is_completed=False)
+            ),
         )
 
         context["completed_tasks_count"] = count_tasks["completed_tasks_count"]
-        context["incomplete_tasks_count"] = count_tasks["unfinished_tasks_count"]
+        context["incomplete_tasks_count"] = (
+            count_tasks["unfinished_tasks_count"]
+        )
         context["completed_tasks"] = task_queryset.filter(is_completed=True)
         context["incomplete_tasks"] = task_queryset.filter(is_completed=False)
 
@@ -69,7 +80,7 @@ class AllTasksListView(LoginRequiredMixin, generic.ListView):
         return Task.objects.prefetch_related("assignees").annotate(
             responsible=Coalesce(
                 Value("Not assigned"),
-                "assignees__username"
+                "assignees__username",
             )
         )
 
@@ -121,7 +132,6 @@ class TeamListView(LoginRequiredMixin, generic.ListView):
         return context
 
 
-
 class WorkerCreateView(LoginRequiredMixin, generic.CreateView):
     model = Worker
     fields = ["first_name", "last_name", "position", "password"]
@@ -157,7 +167,7 @@ class TaskUpdateView(LoginRequiredMixin, generic.UpdateView):
 
 class TaskDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Task
-    template_name = 'task_manager/task_confirm_delete.html'
+    template_name = "task_manager/task_confirm_delete.html"
     success_url = reverse_lazy("task_manager:all-tasks")
 
     def test_func(self):
@@ -165,7 +175,7 @@ class TaskDeleteView(LoginRequiredMixin, generic.DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['task'] = self.object
+        context["task"] = self.object
         return context
 
 
