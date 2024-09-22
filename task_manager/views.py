@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count, Q, Value, OuterRef, Subquery
+from django.db.models import Count, Q, Value, QuerySet
 from django.db.models.functions import Coalesce
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -61,14 +61,11 @@ class AllTasksListView(LoginRequiredMixin, generic.ListView):
     template_name = "all_tasks.html"
     paginate_by = 8
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         return Task.objects.annotate(
             responsible=Coalesce(
-                Subquery(
-                    Task.assignees.through.objects.filter(task_id=OuterRef("pk"))
-                    .values("worker__username")[:1]
-                ),
-                Value("Not assigned")
+                Value("Not assigned"),
+                "assignees__username"
             )
         )
 
@@ -106,12 +103,12 @@ def manage_task(request, task_id, action):
 
 class TeamListView(LoginRequiredMixin, generic.ListView):
     model = Worker
+    context_object_name = "team_members"
     template_name = "team.html"
     paginate_by = 8
-    context_object_name = "team_members"
 
     def get_queryset(self):
-        return Worker.objects.all().order_by("first_name", "last_name")
+        return Worker.objects.order_by("first_name", "last_name")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -164,8 +161,8 @@ class TaskDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 class TaskDetailView(generic.DetailView):
     model = Task
+    context_object_name = "task"
     template_name = "task_manager/task_detail.html"
-    context_object_name = 'task'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

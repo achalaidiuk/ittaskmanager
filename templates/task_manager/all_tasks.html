@@ -26,7 +26,15 @@
             <td>{{ task.name }}</td>
             <td>{{ task.description }}</td>
             <td>{{ task.deadline|date:"Y-m-d" }}</td>
-            <td>{{ task.responsible }}</td>
+            <td>
+              {% if task.assignees.count > 0 %}
+                {% for worker in task.assignees.all %}
+                  <span class="badge badge-info">{{ worker.username }}</span>
+                {% endfor %}
+              {% else %}
+                <span class="badge badge-secondary">Not assigned</span>
+              {% endif %}
+            </td>
             <td>
               {% if task.is_completed %}
                 <span class="badge badge-success">Done</span>
