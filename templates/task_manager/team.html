@@ -25,11 +25,6 @@
                   <strong>First Name:</strong> {{ member.first_name }}<br>
                   <strong>Last Name:</strong> {{ member.last_name }}
                 </p>
-                {% if request.user.is_superuser %}
-                  <div class="text-center">
-                    <a href="{% url 'task_manager:assign_task' member.id %}" class="btn btn-primary">Assign Task</a>
-                  </div>
-                {% endif %}
               </div>
             </div>
           </div>
