@@ -1,5 +1,4 @@
 from django.urls import path
-from django.contrib.auth import views as auth_views
 
 from task_manager.views import (
     MyTasksListView,
@@ -13,6 +12,7 @@ from task_manager.views import (
     TaskDetailView,
     TaskCreateView,
     manage_task,
+    assign_task_view,
 )
 
 app_name = "task_manager"
@@ -28,6 +28,6 @@ urlpatterns = [
     path("worker/create/", WorkerCreateView.as_view(), name="worker-create"),
     path("worker/update/<int:pk>/", WorkerUpdateView.as_view(), name="worker-update"),
     path("task/<int:task_id>/manage/<str:action>/", manage_task, name="manage-task"),
+    path("task/<int:task_id>/take/", assign_task_view, name="assign_task"),
     path("task/<int:task_id>/", TaskDetailView.as_view(), name="task-detail"),
-    path("accounts/login/", auth_views.LoginView.as_view(), name="login"),
 ]
