@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q, Value, OuterRef, Subquery
 from django.db.models.functions import Coalesce
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -33,6 +33,7 @@ def index(request: HttpRequest) -> HttpResponse:
 
     return render(request, "task_manager/index.html", context=context)
 
+
 class MyTasksListView(LoginRequiredMixin, generic.ListView):
     model = Task
     context_object_name = "task_list"
@@ -55,7 +56,6 @@ class MyTasksListView(LoginRequiredMixin, generic.ListView):
         return context
 
 
-
 class AllTasksListView(LoginRequiredMixin, generic.ListView):
     model = Task
     template_name = "all_tasks.html"
@@ -72,36 +72,36 @@ class AllTasksListView(LoginRequiredMixin, generic.ListView):
             )
         )
 
-    def manage_task(self, request, task_id, action):
-        task = get_object_or_404(Task, id=task_id)
-
-        if action == "complete":
-            if request.user in task.assignees.all():
-                task.is_completed = True
-                task.status = "Done"
-                task.done_at = timezone.now()
-                task.save()
-                messages.success(request, "Task has been marked as completed.")
-            else:
-                messages.warning(request, "You cannot complete this task because you are not assigned to it.")
-            return redirect("task_manager:all-tasks")
-
-        elif action == "take":
-            if task.is_completed or task.assignees.filter(id=request.user.id).exists():
-                messages.warning(request, "This task has already been taken or completed.")
-            else:
-                task.assignees.add(request.user)
-                task.status = "In Progress"
-                task.save()
-                messages.success(request, "You have taken the task to work.")
-            return redirect("task_manager:all-tasks")
-
-        return redirect("task_manager:all-tasks")
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["all_possible_tasks"] = Task.objects.count()
         return context
+
+
+@login_required
+def manage_task(request, task_id, action):
+    task = get_object_or_404(Task, id=task_id)
+
+    if action == "complete":
+        if request.user in task.assignees.all():
+            task.is_completed = True
+            task.status = "Completed"
+            task.done_at = timezone.now()
+            task.save()
+            messages.success(request, "Task marked as completed.")
+        else:
+            messages.warning(request, "You cannot complete this task because you are not assigned to it.")
+
+    elif action == "take":
+        if task.is_completed or task.assignees.filter(id=request.user.id).exists():
+            messages.warning(request, "This task has already been taken or completed.")
+        else:
+            task.assignees.add(request.user)
+            task.status = "In progress"
+            task.save()
+            messages.success(request, "You have taken the task for completion.")
+
+    return redirect("task_manager:all-tasks")
 
 
 class TeamListView(LoginRequiredMixin, generic.ListView):
@@ -170,60 +170,3 @@ class TaskDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
-
-
-@login_required
-def work_done(request: HttpRequest, task_id: int) -> HttpResponse:
-    task = get_object_or_404(Task, id=task_id)
-    task.is_completed = True
-    task.done_at = timezone.now()
-    task.save()
-    return HttpResponseRedirect(
-        request.META.get(
-            "HTTP_REFERER",
-            reverse_lazy(viewname="task_manager:my-tasks"))
-    )
-
-
-@login_required
-def take_to_work(request: HttpRequest, task_id: int) -> HttpResponse:
-    task = get_object_or_404(Task, id=task_id)
-
-    if task.is_completed or task.assignees.filter(id=request.user.id).exists():
-        messages.warning(request, "This task has already been taken or completed.")
-        return redirect("task_manager:all-tasks")
-
-    task.assignees.add(request.user)
-    task.status = "In Progress"
-    task.save()
-    messages.success(request, "You have taken the task to work.")
-    return redirect("task_manager:all-tasks")
-
-def complete_task(request: HttpRequest, task_id: int) -> HttpResponse:
-    task = get_object_or_404(Task, id=task_id)
-
-    if request.user in task.assignees.all():
-        task.is_completed = True
-        task.status = "Done"
-        task.done_at = timezone.now()
-        task.save()
-        messages.success(request, "Task has been marked as completed.")
-    else:
-        messages.warning(request, "You cannot complete this task because you are not assigned to it.")
-
-    return redirect("task_manager:all-tasks")
-
-
-@login_required
-def assign_task(request, member_id):
-    member = Worker.objects.get(id=member_id)
-    tasks = Task.objects.filter(is_completed=False)
-
-    if request.method == "POST":
-        task_id = request.POST.get('task_id')
-        task = Task.objects.get(id=task_id)
-        task.assignees.add(member)
-        task.save()
-        return redirect('task_manager:team')
-
-    return render(request, 'assign_task.html', {'member': member, 'tasks': tasks})
