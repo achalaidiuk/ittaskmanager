@@ -5,6 +5,10 @@ A Django-based application for efficient task tracking, assignment, and project 
    Login: interjkee
    Password: lokaster52624
 ```
+## Check it out!
+
+[ItTaskManager project deployed to Render] (ittaskmanager-tanr.onrender.com)
+
 # This is sctructure for project:
 
 ![img.png](static/img.png)
