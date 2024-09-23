@@ -2,7 +2,7 @@
 A Django-based application for efficient task tracking, assignment, and project management within IT teams.
 ```shell
    info about superuser:
-   Login: interjkee
+   Login:Interjkee
    Password: lokaster52624
 ```
 ## Check it out!
