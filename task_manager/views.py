@@ -154,6 +154,7 @@ class TaskCreateView(LoginRequiredMixin, View):
         if form.is_valid():
             task = form.save(commit=False)
             task.save()
+            form.save_m2m()
             messages.success(request, "Task has been created successfully.")
             return redirect("task_manager:all-tasks")
         return render(request, "task_manager/task_form.html", {"form": form, "object": None})
