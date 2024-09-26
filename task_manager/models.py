@@ -6,7 +6,7 @@ from django.conf import settings
 class Position(models.Model):
     name = models.CharField(max_length=100)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -15,7 +15,7 @@ class Worker(AbstractUser):
         Position, on_delete=models.CASCADE, null=True, default=None
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.first_name} {self.last_name} working as {self.position}"
 
     class Meta:
@@ -26,7 +26,7 @@ class Worker(AbstractUser):
 class TaskType(models.Model):
     name = models.CharField(max_length=100)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -46,7 +46,7 @@ class Task(models.Model):
     done_at = models.DateTimeField(null=True, blank=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
-    deadline = models.DateTimeField()
+    deadline = models.DateTimeField(null=True, blank=True)
     is_completed = models.BooleanField(default=False)
     priority = models.CharField(choices=PRIORITY_CHOICES, max_length=6)
     task_type = models.ForeignKey(
@@ -60,14 +60,15 @@ class Task(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         if self.is_completed:
-            self.status = "Done"
+            self.status = Task.STATUS_CHOICES[2][0]
         else:
-            self.status = "In Progress"
+            self.status = Task.STATUS_CHOICES[1][0]
+
         super().save(*args, **kwargs)
 
-    def __str__(self):
+    def __str__(self) -> str:
         assignee_names = ", ".join(
             str(assignee) for assignee in self.assignees.all())
         return (

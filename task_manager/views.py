@@ -31,9 +31,7 @@ def index(request: HttpRequest) -> HttpResponse:
         "num_visits": num_visits,
     }
 
-    return render(
-        request, "task_manager/index.html", context=context
-    )
+    return render(request, "task_manager/index.html", context=context)
 
 
 class MyTasksListView(LoginRequiredMixin, generic.ListView):
@@ -41,30 +39,21 @@ class MyTasksListView(LoginRequiredMixin, generic.ListView):
     context_object_name = "task_list"
     template_name = "my_tasks.html"
 
-    def get_queryset(self):
-        return (
-            Task.objects.filter(assignees=self.request.user)
-                .prefetch_related("assignees")
-        )
+    def get_queryset(self) -> QuerySet:
+        return Task.objects.filter(assignees=self.request.user).prefetch_related("assignees")
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
 
         task_queryset = self.get_queryset()
 
         count_tasks = task_queryset.aggregate(
-            completed_tasks_count=Count(
-                "id", filter=Q(is_completed=True)
-            ),
-            unfinished_tasks_count=Count(
-                "id", filter=Q(is_completed=False)
-            ),
+            completed_tasks_count=Count("id", filter=Q(is_completed=True)),
+            unfinished_tasks_count=Count("id", filter=Q(is_completed=False)),
         )
 
         context["completed_tasks_count"] = count_tasks["completed_tasks_count"]
-        context["incomplete_tasks_count"] = (
-            count_tasks["unfinished_tasks_count"]
-        )
+        context["incomplete_tasks_count"] = count_tasks["unfinished_tasks_count"]
         context["completed_tasks"] = task_queryset.filter(is_completed=True)
         context["incomplete_tasks"] = task_queryset.filter(is_completed=False)
 
@@ -78,28 +67,25 @@ class AllTasksListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self) -> QuerySet:
         return Task.objects.prefetch_related("assignees").annotate(
-            responsible=Coalesce(
-                Value("Not assigned"),
-                "assignees__username",
-            )
+            responsible=Coalesce(Value("Not assigned"), "assignees__username")
         )
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
         context["all_possible_tasks"] = self.model.objects.count()
         return context
 
 
 @login_required
-def manage_task(request, task_id, action):
+def manage_task(request: HttpRequest, task_id: int, action: str) -> HttpResponse:
     task = get_object_or_404(Task, id=task_id)
 
     if action == "complete":
         if request.user in task.assignees.all():
             task.is_completed = True
-            task.status = "Completed"
+            task.status = Task.STATUS_CHOICES[2][0]
             task.done_at = timezone.now()
-            task.save()
+            task.save(update_fields=["is_completed", "status", "done_at"])
             messages.success(request, "Task marked as completed.")
         else:
             messages.warning(request, "You cannot complete this task because you are not assigned to it.")
@@ -109,8 +95,8 @@ def manage_task(request, task_id, action):
             messages.warning(request, "This task has already been taken or completed.")
         else:
             task.assignees.add(request.user)
-            task.status = "In progress"
-            task.save()
+            task.status = Task.STATUS_CHOICES[1][0]
+            task.save(update_fields=["assignees", "status"])
             messages.success(request, "You have taken the task for completion.")
 
     return redirect("task_manager:all-tasks")
@@ -122,10 +108,10 @@ class TeamListView(LoginRequiredMixin, generic.ListView):
     template_name = "team.html"
     paginate_by = 8
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         return Worker.objects.select_related("position").prefetch_related("tasks").order_by("first_name", "last_name")
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
         context["total_members"] = self.get_queryset().count()
         context["title"] = "Our Team"
@@ -145,19 +131,21 @@ class WorkerUpdateView(LoginRequiredMixin, generic.UpdateView):
 
 
 class TaskCreateView(LoginRequiredMixin, View):
-    def get(self, request):
+    def get(self, request: HttpRequest) -> HttpResponse:
         form = TaskCreationForm()
         return render(request, "task_manager/task_form.html", {"form": form, "object": None})
 
-    def post(self, request):
+    def post(self, request: HttpRequest) -> HttpResponse:
         form = TaskCreationForm(request.POST)
         if form.is_valid():
             task = form.save(commit=False)
+            task.created_by = request.user
             task.save()
             form.save_m2m()
             messages.success(request, "Task has been created successfully.")
             return redirect("task_manager:all-tasks")
         return render(request, "task_manager/task_form.html", {"form": form, "object": None})
+
 
 
 class TaskUpdateView(LoginRequiredMixin, generic.UpdateView):
@@ -171,10 +159,10 @@ class TaskDeleteView(LoginRequiredMixin, generic.DeleteView):
     template_name = "task_manager/task_confirm_delete.html"
     success_url = reverse_lazy("task_manager:all-tasks")
 
-    def test_func(self):
+    def test_func(self) -> bool:
         return self.request.user.is_admin
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
         context["task"] = self.object
         return context
@@ -185,6 +173,6 @@ class TaskDetailView(generic.DetailView):
     context_object_name = "task"
     template_name = "task_manager/task_detail.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
         return context
