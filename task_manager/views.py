@@ -114,7 +114,7 @@ class TeamListView(LoginRequiredMixin, generic.ListView):
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
         context["total_members"] = self.get_queryset().count()
-        context["title"] = "Our Team"
+        context["title"] = "Meet Our Dedicated Team"
         return context
 
 
