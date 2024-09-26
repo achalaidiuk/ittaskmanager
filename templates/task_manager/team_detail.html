@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>
+    Team Member: {{ member.username }}
+    <a href="{% url 'task_manager:member-delete' pk=member.id %}" class="btn btn-danger link-to-page">
+      Delete
+    </a>
+    <a href="{% url 'task_manager:member-update' pk=member.id %}" class="btn btn-secondary link-to-page">
+      Update
+    </a>
+  </h1>
+  <p>Position: {{ member.position.name|default:"Not assigned" }}</p>
+  <h2>Details</h2>
+  <p>First Name: {{ member.first_name }}</p>
+  <p>Last Name: {{ member.last_name }}</p>
+  <p>Email: {{ member.email|default:"Not provided" }}</p>
+
+  <h3>Assigned Tasks</h3>
+  <ul>
+    {% for task in member.tasks.all %}
+      <li>{{ task.task_name }} (Deadline: {{ task.deadline }})</li>
+    {% empty %}
+      <li>No tasks assigned.</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{% url 'task_manager:team' %}" class="btn btn-primary mt-4">Back to Team List</a>
+{% endblock %}

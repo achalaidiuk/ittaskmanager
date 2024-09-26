@@ -1,0 +1,9 @@
+<div class="container mt-4">
+  {% if user.is_superuser %}
+    <div class="mb-3">
+      <a href="{% url 'task_manager:task-create' %}" class="btn btn-primary">
+        Create New Task
+      </a>
+    </div>
+  {% endif %}
+</div>

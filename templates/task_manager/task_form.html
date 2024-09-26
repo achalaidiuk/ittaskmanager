@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h1 class="text-center mb-4">{{ object|yesno:"Update,Create" }} Task</h1>
+    <form action="" method="post" novalidate>
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="{{ form.name.id_for_label }}">Name</label>
+        <input type="text" name="{{ form.name.name }}" id="{{ form.name.id_for_label }}" class="form-control form-control-sm" value="{{ form.name.value|default:'' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.description.id_for_label }}">Description</label>
+        <textarea name="{{ form.description.name }}" id="{{ form.description.id_for_label }}" class="form-control form-control-sm" required>{{ form.description.value|default:'' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.deadline.id_for_label }}">Deadline</label>
+        <input type="date" name="{{ form.deadline.name }}" id="{{ form.deadline.id_for_label }}" class="form-control form-control-sm" value="{{ form.deadline.value|default:'' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.priority.id_for_label }}">Priority</label>
+        <select name="{{ form.priority.name }}" id="{{ form.priority.id_for_label }}" class="form-control form-control-sm" required>
+          {% for choice in form.priority.field.choices %}
+            <option value="{{ choice.0 }}" {% if choice.0 == form.priority.value %}selected{% endif %}>{{ choice.1 }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.task_type.id_for_label }}">Task Type</label>
+        <select name="{{ form.task_type.name }}" id="{{ form.task_type.id_for_label }}" class="form-control form-control-sm" required>
+          {% for choice in form.task_type.field.choices %}
+            <option value="{{ choice.0 }}" {% if choice.0 == form.task_type.value %}selected{% endif %}>{{ choice.1 }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.assignees.id_for_label }}">Assignees</label><br>
+        {% for assignee in form.assignees.field.choices %}
+          <div class="form-check">
+            <input type="checkbox" name="{{ form.assignees.name }}" id="assignee_{{ assignee.0 }}" value="{{ assignee.0 }}" {% if assignee.0 in form.assignees.value %}checked{% endif %} class="form-check-input">
+            <label for="assignee_{{ assignee.0 }}" class="form-check-label">{{ assignee.1 }}</label>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.status.id_for_label }}">Status</label>
+        <select name="{{ form.status.name }}" id="{{ form.status.id_for_label }}" class="form-control form-control-sm" required>
+          <option value="new" {% if form.status.value == 'new' %}selected{% endif %}>New</option>
+          <option value="in_progress" {% if form.status.value == 'in_progress' %}selected{% endif %}>In Progress</option>
+          <option value="done" {% if form.status.value == 'done' %}selected{% endif %}>Done</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.done_at.id_for_label }}">Done At</label>
+        <input type="datetime-local" name="{{ form.done_at.name }}" id="{{ form.done_at.id_for_label }}" class="form-control form-control-sm" value="{{ form.done_at.value|default:'' }}">
+      </div>
+
+      <div class="form-group">
+        <div class="form-check">
+          <input type="checkbox" name="{{ form.is_completed.name }}" id="{{ form.is_completed.id_for_label }}" class="form-check-input" {% if form.is_completed.value %}checked{% endif %}>
+          <label for="{{ form.is_completed.id_for_label }}" class="form-check-label">Is Completed</label>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <input type="submit" value="{{ object|yesno:'Update,Create' }}" class="btn btn-primary btn-lg">
+        <a href="{% url 'task_manager:all-tasks' %}" class="btn btn-secondary btn-lg">Cancel</a>
+      </div>
+    </form>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger mt-3">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    {% for field in form %}
+      {% if field.errors %}
+        <div class="alert alert-danger">
+          {{ field.errors }}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endblock %}

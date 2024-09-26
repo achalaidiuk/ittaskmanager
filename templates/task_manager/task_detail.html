@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="container">
+    <h2>{{ task.name }}</h2>
+    <p><strong>Description:</strong> {{ task.description }}</p>
+    <p><strong>Deadline:</strong> {{ task.deadline }}</p>
+    <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
+    <p><strong>Is Completed:</strong> {{ task.is_completed|yesno:"Yes,No" }}</p>
+
+    {% if task.is_completed and task.done_at %}
+      <p><strong>Completed At:</strong> {{ task.done_at|date:"Y-m-d H:i" }}</p>
+    {% endif %}
+
+    <div class="mt-3">
+      {% if request.user.is_superuser %}
+        <a href="{% url 'task_manager:task-delete' task.id %}" class="btn btn-danger"
+           onclick="return confirm('Are you sure?');">Delete</a>
+      {% endif %}
+      <a href="{% url 'task_manager:my-tasks' %}" class="btn btn-primary">Back to My Tasks</a>
+    </div>
+  </div>
+{% endblock %}

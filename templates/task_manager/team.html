@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+  <div class="container mt-4">
+    <h1 class="mb-4 text-center">Meet Our Dedicated Team</h1>
+    
+    {% if request.user.is_superuser %}
+      <div class="mb-4">
+        <div class="text-start">
+          <a href="{% url 'task_manager:worker-create' %}" class="btn btn-success">Create New Worker</a>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if team_members %}
+      <div class="row">
+        {% for member in team_members %}
+          <div class="col-md-6 mb-4 d-flex align-items-start">
+            <div class="card shadow-sm w-100">
+              <img src="{% if member.profile_picture %}{{ member.profile_picture.url }}{% else %}{% static 'avatar.png' %}{% endif %}" class="card-img-top" alt="{{ member.username }}'s photo" style="height: 200px; width: 200px; object-fit: cover; border-radius: 50%; margin: auto;">
+              <div class="card-body">
+                <h5 class="card-title" style="font-size: 1.5rem;">{{ member.username }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted" style="font-size: 1.2rem;">{{ member.position.name|default:"Not assigned" }}</h6>
+                <p class="card-text" style="font-size: 1.1rem;">
+                  <strong>First Name:</strong> {{ member.first_name }}<br>
+                  <strong>Last Name:</strong> {{ member.last_name }}
+                </p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="alert alert-info text-center" role="alert">
+        No team members available.
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
